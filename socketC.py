@@ -46,6 +46,7 @@ if __name__ == '__main__':
     "fileName" : "data.txt",
     }
     reSend = False
+    reCount = 5
     while reSend:
         try:
             if count < reCount:
