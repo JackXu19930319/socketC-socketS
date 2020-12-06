@@ -41,26 +41,41 @@ class socketClient():
             self.client.close()
 
 if __name__ == '__main__':
-    fuleFullPath = "data.txt"
-    heardDict = {
-    "fileName" : "data.txt",
-    }
-    reSend = False
-    reCount = 5
-    while reSend:
-        try:
-            if count < reCount:
-                client = socketClient("127.0.0.1", 8000)
-                if client.sendObj(fuleFullPath, heardDict):
-                    reSend = False
+    with open("socket_setting.json", "r", encoding="utf-8") as f:
+        settingJson = json.load(f)
+
+    filePath = settingJson["filePath"]
+
+    files = os.listdir(filePath)
+
+    count = 0
+    reCount = settingJson["reCount"]
+    port = settingJson["port"]
+    ip = settingJson["sendIp"]
+    ####################################
+    for f in files:
+        fileName = str(i) + "_" + str(f)
+        heardDict = {
+            "filename": fileName,
+            "deviceId": settingJson["deviceId"]
+        }
+        isSend = True
+        while isSend:
+            try:
+                client = socketClient(ip, port)
+                if client.sendObj(os.path.join(filePath, f), heardDict):
+                    isSend = False
                     count = 0
-                    print("%s >> done" %(f))
-            else:
-                reSend = False
-        except Exception as e:
-            count += 1
-            print("ERROR: %s>>%s" % (os.path.join(filePath, f), e))
-            with open('log.txt', "a") as f:
-                f.writelines(str(e) + "\n")
-                f.close()
-            pass
+                    print("%s >> done" %(fileName))
+            except Exception as e:
+                count += 1
+                print("ERROR: %s>>%s" % (os.path.join(filePath, f), e))
+                if count > reCount:
+                    with open('log.txt', "a") as f:
+                        f.writelines(str(e) + "\n")
+                        f.close()
+                    time.sleep(20)
+                count = 0
+                isSend = True
+                pass
+        ####################################
