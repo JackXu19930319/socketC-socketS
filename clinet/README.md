@@ -1,0 +1,1 @@
+socketC.exe {sendIP} {sendPort} {filePath} 1 {floder,fileName}
